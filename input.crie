@@ -1,18 +1,27 @@
-nome é 'joão'
-
-sobrenome é 'da silva'
-menina é verdadeiro
-idade é: pergunte 'qual a sua idade?'
-escreva idade
-criança é: idade menor que 10
-vamos_brincar é: criança e menina
-resposta é: pergunte 'vamos brincar?'
-se resposta for 'sim'
-| escreva 'oi!'
-quando resposta for 'não'
-| escreva 'tchau!'
+escreva! 'olá'
+vamos_brincar é: pergunte! 'vamos brincar?'
+se vamos_brincar for 'sim'
+| nome é: pergunte! 'qual o seu nome?'
+| idade é: pergunte! 'oi ' e nome e ' qual a sua idade?'
+| idade é: converta_para_numero! idade
+| tipo é: pergunte! 'você é menina ou menino'
+| se tipo for 'menino'
+| | escreva! 'O ' e nome e ' é um ' e tipo
+| quando tipo for 'menina'
+| | escreva! 'A ' e nome e ' é uma ' e tipo
+| enquanto idade for maior que 0
+| | escreva! idade
+| | idade é: idade - 1
+quando vamos_brincar for 'não'
+| escreva! 'tá bom, tchau!'
 senão
-| escreva 'não entendi'
+| escreva! 'não entendi.'
 
-enquanto resposta não for 'sim'
-| resposta é: pergunte 'vamos brincar?'
+
+ação conte usando numero
+| numero_atual é 0
+| enquanto numero_atual não for maior que numero
+| | escreva! numero_atual
+| | numero_atual é: numero_atual + 1
+
+conte! 10

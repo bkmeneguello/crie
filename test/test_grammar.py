@@ -4,6 +4,8 @@ import crie
 
 class GrammarCase(unittest.TestCase):
 
+    maxDiff = None
+
     boolean_values = [
         "verdadeiro",
         "falso"
@@ -19,6 +21,7 @@ class GrammarCase(unittest.TestCase):
     logic_expressions = [
         "x ou y",
         "x e y"
+        # TODO: "não x"
     ]
     boolean_expressions = [
         "x for y",
@@ -26,24 +29,29 @@ class GrammarCase(unittest.TestCase):
         "x for 10",
         "x não for 10",
         "x for 'sim'",
-        "x maior que y",
-        "x não maior que y",
-        "x maior que 10",
-        "x não maior que 10",
-        "x menor que y",
-        "x não menor que y",
-        "x menor que 10",
-        "x não menor que 10"
+        "x for maior que y",
+        "x não for maior que y",
+        "x for maior que 10",
+        "x não for maior que 10",
+        "x for menor que y",
+        "x não for menor que y",
+        "x for menor que 10",
+        "x não for menor que 10"
     ]
     expressions = [
-        "pergunte",
-        "pergunte 'teste'"
+        "pergunte!",
+        "pergunte! 'teste'",
+        "pergunte! 'teste' e 'teste'",
+        "x + 10",
+        "x - 10",
+        "x * 10",
+        "x / 10"
     ] + logic_expressions + boolean_expressions
 
     def test_script(self):
         with open('input.crie') as input_crie:
             rule = crie.grammar.parse(input_crie.read())
-            script = crie.Python3Translator().visit(rule)
+            script = crie.Python3Translator().translate(rule)
             with open('output.py') as output_py:
                 self.assertEqual(output_py.read(), script)
 
@@ -72,6 +80,20 @@ class GrammarCase(unittest.TestCase):
             with self.subTest(value=value):
                 rule = crie.grammar['loop'].parse("enquanto %s" % value)
                 self.assertIsNotNone(rule)
+
+    def test_action(self):
+        with self.subTest(arguments=0):
+            rule = crie.grammar['action'].parse("ação x")
+            self.assertIsNotNone(rule)
+        with self.subTest(arguments=1):
+            rule = crie.grammar['action'].parse("ação x usando y")
+            self.assertIsNotNone(rule)
+        with self.subTest(arguments=2):
+            rule = crie.grammar['action'].parse("ação x usando y e z")
+            self.assertIsNotNone(rule)
+        with self.subTest(arguments=3):
+            rule = crie.grammar['action'].parse("ação x usando y e w e z")
+            self.assertIsNotNone(rule)
 
 
 if __name__ == '__main__':

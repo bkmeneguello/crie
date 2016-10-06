@@ -1,18 +1,28 @@
-nome = 'joão'
-
-sobrenome = 'da silva'
-menina = True
-idade = input('qual a sua idade?')
-print(idade)
-criança = idade < 10
-vamos_brincar = criança and menina
-resposta = input('vamos brincar?')
-if resposta == 'sim':
-    print('oi!')
-elif resposta == 'não':
-    print('tchau!')
+from crie.stdlib import *
+escreva('olá')
+vamos_brincar = pergunte('vamos brincar?')
+if vamos_brincar == 'sim':
+    nome = pergunte('qual o seu nome?')
+    idade = pergunte('oi ', nome, ' qual a sua idade?')
+    idade = converta_para_numero(idade)
+    tipo = pergunte('você é menina ou menino')
+    if tipo == 'menino':
+        escreva('O ', nome, ' é um ', tipo)
+    elif tipo == 'menina':
+        escreva('A ', nome, ' é uma ', tipo)
+    while idade > 0:
+        escreva(idade)
+        idade = idade - 1
+elif vamos_brincar == 'não':
+    escreva('tá bom, tchau!')
 else:
-    print('não entendi')
+    escreva('não entendi.')
 
-while resposta != 'não':
-    resposta = input('vamos brincar?')
+
+def conte(numero):
+    numero_atual = 0
+    while numero_atual <= numero:
+        escreva(numero_atual)
+        numero_atual = numero_atual + 1
+
+conte(10)

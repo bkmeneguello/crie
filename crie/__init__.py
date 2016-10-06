@@ -4,7 +4,7 @@ grammar = Grammar(
     r"""
     script = line*
     line = instruction? space* newline
-    instruction = indent* (loop / conditional / command / assignment)
+    instruction = indent* (loop / conditional / action / assignment / command)
     indent = "|" space+
     space = " "
     loop = loop_oper space+ boolean_expr
@@ -12,13 +12,16 @@ grammar = Grammar(
     conditional = conditional_if / conditional_elif / conditional_else
     conditional_if = conditional_if_oper space+ boolean_expr
     conditional_if_oper = "se"
-    boolean_expr = equals / less_than / greather_than / name
+    boolean_expr = not_less_than / less_than / not_greather_than / greather_than / not_equals / equals / name
     equals = value space+ equals_oper space+ value
-    equals_oper = (not space+)? "for"
-    not = "não"
-    less_than = value space+ (not space+)? less_than_oper space+ value
+    not_equals = value space+ not_oper space+ equals_oper space+ value
+    equals_oper = "for"
+    not_oper = "não"
+    less_than = value space+ equals_oper space+ less_than_oper space+ value
+    not_less_than = value space+ not_oper space+ equals_oper space+ less_than_oper space+ value
     less_than_oper = "menor que"
-    greather_than = value space+ (not space+)? greather_than_oper space+ value
+    greather_than = value space+ equals_oper space+ greather_than_oper space+ value
+    not_greather_than = value space+ not_oper space+ equals_oper space+ greather_than_oper space+ value
     greather_than_oper = "maior que"
     boolean_or = boolean_value space+ or_oper space+ boolean_value
     boolean_value = name / boolean
@@ -31,24 +34,35 @@ grammar = Grammar(
     conditional_elif_oper = "quando"
     conditional_else = conditional_else_oper
     conditional_else_oper = "senão"
-    command = print / ask
-    print = print_oper space+ value
-    print_oper = "escreva"
-    ask = ask_oper (space+ value)?
-    ask_oper = "pergunte"
+    command = name "!" (space+ arguments)?
+    arguments = value (space+ argument_sep_oper space+ value)*
+    argument_sep_oper = "e"
     newline = "\n" / ~"$"
-    assignment = name space+ assign_oper (assign_value / assign_ask / assign_boolean_expr)
+    action = action_oper space+ name (space+ using_oper space+ parameters)?
+    action_oper = "ação"
+    using_oper = "usando"
+    parameters = name (space+ parameter_sep_oper space+ name)*
+    parameter_sep_oper = "e"
+    assignment = name space+ assign_oper (assign_expr / assign_value)
+    assign_expr = colon space+ (command / math_expr / assign_boolean_expr)
+    colon = ":"
+    assign_value = space+ value
     assign_oper = "é"
-    assign_value = space+ (value / boolean_value)
-    value = text / number / boolean / name
+    value = text / decimal / integer / boolean / name
     text = quote plain_text quote
     quote = "'"
     plain_text = ~"[^']+"i
-    number = ~"[0-9]+(\\.[0-9]+)?"
-    assign_ask = colon space+ ask
-    colon = ":"
-    assign_boolean_expr = colon space+ (boolean_and / boolean_or / boolean_expr)
+    integer = ~"[0-9]+"
+    decimal = ~"[0-9]+\\.[0-9]+"
+    assign_boolean_expr = boolean_and / boolean_or / boolean_expr
+    math_expr = number_value space+ (plus_oper / less_oper / mult_oper / div_oper) space+ number_value
+    number_value = decimal / integer / name
+    plus_oper = "+"
+    less_oper = "-"
+    mult_oper = "*"
+    div_oper = "/"
     """)
+
 
 class Python3Translator(NodeVisitor):
 
@@ -56,6 +70,9 @@ class Python3Translator(NodeVisitor):
         return " ".join((child for child in children if child))
 
     def visit_less_than(self, _, children):
+        return " ".join((child for child in children if child))
+
+    def visit_greather_than(self, _, children):
         return " ".join((child for child in children if child))
 
     def visit_boolean_and(self, _, children):
@@ -67,79 +84,122 @@ class Python3Translator(NodeVisitor):
     def visit_conditional_elif(self, _, children):
         return " ".join((child for child in children if child)) + ":"
 
+    def visit_action(self, _, children):
+        return "def " + children[2] + "(" + children[3] + "):"
+
     def visit_equals(self, _, children):
+        return " ".join((child for child in children if child))
+
+    def visit_not_equals(self, _, children):
+        children[4] = '!='
+        return " ".join((child for child in children if child))
+
+    def visit_less_than(self, _, children):
+        children[2] = ''
+        children[4] = '<'
+        return " ".join((child for child in children if child))
+
+    def visit_not_less_than(self, _, children):
+        children[4] = '>='
+        children[6] = ''
+        return " ".join((child for child in children if child))
+
+    def visit_greather_than(self, _, children):
+        children[2] = ''
+        children[4] = '>'
+        return " ".join((child for child in children if child))
+
+    def visit_not_greather_than(self, _, children):
+        children[4] = '<='
+        children[6] = ''
         return " ".join((child for child in children if child))
 
     def visit_loop(self, _, children):
         return " ".join((child for child in children if child)) + ":"
 
-    def visit_print(self, _, children):
+    def visit_math_expr(self, _, children):
+        return " ".join((child for child in children if child))
+
+    def visit_command(self, _, children):
         (oper, _, value) = children
         return oper + "(" + value + ")"
 
-    def visit_print_oper(self, _, children):
-        return "print"
-
-    def visit_ask(self, _, children):
-        (oper, value) = children
-        return oper + "(" + value + ")"
-
-    def visit_ask_oper(self, _, children):
-        return "input"
-
-    def visit_colon(self, _, children):
+    def visit_colon(self, *_):
         pass
 
-    def visit_newline(self, _, children):
+    def visit_newline(self, *_):
         return "\n"
 
-    def visit_assign_oper(self, _, children):
+    def visit_assign_oper(self, *_):
         return "="
 
-    def visit_less_than_oper(self, _, children):
-        return "<"
-
-    def visit_and_oper(self, _, children):
+    def visit_and_oper(self, *_):
         return "and"
 
-    def visit_conditional_if_oper(self, _, children):
+    def visit_conditional_if_oper(self, *_):
         return "if"
 
-    def visit_conditional_elif_oper(self, _, children):
+    def visit_conditional_elif_oper(self, *_):
         return "elif"
 
-    def visit_conditional_else_oper(self, _, children):
+    def visit_conditional_else_oper(self, *_):
         return "else:"
 
-    def visit_loop_oper(self, _, children):
+    def visit_loop_oper(self, *_):
         return "while"
 
-    def visit_equals_oper(self, _, children):
+    def visit_equals_oper(self, *_):
         return "=="
 
-    def visit_indent(self, _, children):
+    def visit_argument_sep_oper(self, *_):
+        return ", "
+
+    def visit_parameter_sep_oper(self, *_):
+        return ", "
+
+    def visit_plus_oper(self, *_):
+        return "+"
+
+    def visit_less_oper(self, *_):
+        return "-"
+
+    def visit_mult_oper(self, *_):
+        return "*"
+
+    def visit_div_oper(self, *_):
+        return "/"
+
+    def visit_indent(self, *_):
         return "    "
 
-    def visit_text(self, text, children):
+    def visit_text(self, text, *_):
         return text.text
 
-    def visit_boolean(self, boolean, children):
+    def visit_boolean(self, boolean, *_):
         return {'verdadeiro': 'True', 'falso': 'False'}[boolean.text]
 
-    def visit_name(self, name, children):
+    def visit_name(self, name, *_):
         return name.text
 
-    def visit_number(self, number, children):
-        return number.text
+    def visit_integer(self, integer, *_):
+        return integer.text
 
-    def visit_space(self, _, children):
+    def visit_decimal(self, decimal, *_):
+        return decimal.text
+
+    def visit_space(self, *_):
         pass
 
-    def visit_quote(self, _, children):
+    def visit_quote(self, *_):
         return "'"
 
-    def visit_plain_text(self, plain_text, children):
-        plain_text.text
+    def visit_plain_text(self, plain_text, *_):
+        return plain_text.text
 
-    def generic_visit(self, node, children):
+    def generic_visit(self, _, children):
         return "".join((child for child in children if child))
+
+    def translate(self, node):
+        script = 'from crie.stdlib import *\n'
+        script += self.visit(node)
+        return script
