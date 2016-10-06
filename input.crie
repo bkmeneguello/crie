@@ -1,0 +1,18 @@
+nome é 'joão'
+
+sobrenome é 'da silva'
+menina é verdadeiro
+idade é: pergunte 'qual a sua idade?'
+escreva idade
+criança é: idade menor que 10
+vamos_brincar é: criança e menina
+resposta é: pergunte 'vamos brincar?'
+se resposta for 'sim'
+| escreva 'oi!'
+quando resposta for 'não'
+| escreva 'tchau!'
+senão
+| escreva 'não entendi'
+
+enquanto resposta não for 'sim'
+| resposta é: pergunte 'vamos brincar?'
