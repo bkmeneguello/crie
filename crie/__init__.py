@@ -4,7 +4,7 @@ grammar = Grammar(
     r"""
     script = line*
     line = instruction? space* newline
-    instruction = indent* (loop / conditional / action / assignment / command)
+    instruction = indent* (loop / conditional / action / assignment / command / object_command)
     indent = "|" space+
     space = " "
     loop = loop_oper space+ boolean_expr
@@ -25,7 +25,7 @@ grammar = Grammar(
     greather_than_oper = "maior que"
     boolean_or = boolean_value space+ or_oper space+ boolean_value
     boolean_value = name / boolean
-    name   = ~"\w+"
+    name = ~"\w+"
     boolean = "verdadeiro" / "falso"
     or_oper = "ou"
     boolean_and = boolean_expr space+ and_oper space+ boolean_expr
@@ -44,7 +44,7 @@ grammar = Grammar(
     parameters = name (space+ parameter_sep_oper space+ name)*
     parameter_sep_oper = "e"
     assignment = name space+ assign_oper (assign_expr / assign_value)
-    assign_expr = colon space+ (command / math_expr / assign_boolean_expr)
+    assign_expr = colon space+ (command / object_command / math_expr / assign_boolean_expr)
     colon = ":"
     assign_value = space+ value
     assign_oper = "é"
@@ -61,6 +61,8 @@ grammar = Grammar(
     less_oper = "-"
     mult_oper = "*"
     div_oper = "/"
+    object_command = name object_command_oper space+ command
+    object_command_oper = ","
     """)
 
 
@@ -168,6 +170,9 @@ class Python3Translator(NodeVisitor):
 
     def visit_div_oper(self, *_):
         return "/"
+
+    def visit_object_command_oper(self, *_):
+        return "."
 
     def visit_indent(self, *_):
         return "    "

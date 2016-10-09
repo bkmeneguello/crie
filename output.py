@@ -26,3 +26,7 @@ def conte(numero):
         numero_atual = numero_atual + 1
 
 conte(10)
+
+lista = nova_lista()
+lista.adicione('teste')
+registro = lista.retorne(0)

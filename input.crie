@@ -25,3 +25,7 @@ ação conte usando numero
 | | numero_atual é: numero_atual + 1
 
 conte! 10
+
+lista é: nova_lista!
+lista, adicione! 'teste'
+registro é: lista, retorne! 0

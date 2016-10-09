@@ -45,7 +45,10 @@ class GrammarCase(unittest.TestCase):
         "x + 10",
         "x - 10",
         "x * 10",
-        "x / 10"
+        "x / 10",
+        "teste, faça!",
+        "teste, faça! x",
+        "teste, faça! x e y"
     ] + logic_expressions + boolean_expressions
 
     def test_script(self):
@@ -93,6 +96,17 @@ class GrammarCase(unittest.TestCase):
             self.assertIsNotNone(rule)
         with self.subTest(arguments=3):
             rule = crie.grammar['action'].parse("ação x usando y e w e z")
+            self.assertIsNotNone(rule)
+
+    def test_object_command(self):
+        with self.subTest(arguments=0):
+            rule = crie.grammar['object_command'].parse("teste, faça!")
+            self.assertIsNotNone(rule)
+        with self.subTest(arguments=1):
+            rule = crie.grammar['object_command'].parse("teste, faça! x")
+            self.assertIsNotNone(rule)
+        with self.subTest(arguments=2):
+            rule = crie.grammar['object_command'].parse("teste, faça! x e y")
             self.assertIsNotNone(rule)
 
 

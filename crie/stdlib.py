@@ -11,3 +11,19 @@ def converta_para_numero(numeric):
         return int(numeric)
     except ValueError:
         return float(numeric)
+
+
+class Lista(object):
+
+    def __init__(self):
+        self.lista = []
+
+    def adicione(self, valor):
+        self.lista.append(valor)
+
+    def retorne(self, indice):
+        return self.lista[indice]
+
+
+def nova_lista():
+    return Lista()
