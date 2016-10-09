@@ -28,4 +28,5 @@ conte! 10
 
 lista é: nova_lista!
 lista, adicione! 'teste'
-registro é: lista, retorne! 0
+registro é: lista, retorne! 1
+escreva! registro

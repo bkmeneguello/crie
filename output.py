@@ -29,4 +29,5 @@ conte(10)
 
 lista = nova_lista()
 lista.adicione('teste')
-registro = lista.retorne(0)
+registro = lista.retorne(1)
+escreva(registro)

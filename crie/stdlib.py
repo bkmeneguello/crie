@@ -22,7 +22,7 @@ class Lista(object):
         self.lista.append(valor)
 
     def retorne(self, indice):
-        return self.lista[indice]
+        return self.lista[indice - 1]
 
 
 def nova_lista():
